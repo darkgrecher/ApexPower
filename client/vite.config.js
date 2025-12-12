@@ -17,7 +17,7 @@ export default defineConfig({
     ],
     proxy: {
       "/user-finger-print-register-backend": {
-        target: "http://localhost:3000",
+        target: "http://localhost:8000",
         changeOrigin: true,
       },
     },
