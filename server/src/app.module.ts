@@ -15,6 +15,7 @@ import { UserFingerPrintRegisterBackendModule } from './modules/user-finger-prin
 import { UserFingerPrintRegisterBackendService } from './modules/user-finger-print-register-backend/user-finger-print-register-backend.service';
 import { UserFingerPrintRegisterBackendController } from './modules/user-finger-print-register-backend/user-finger-print-register-backend.controller';
 import { HrFingerprintsModule } from './modules/hr-fingerprints/hr-fingerprints.module';
+import { DoorUnlockModule } from './modules/door-unlock/door-unlock.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { HrFingerprintsModule } from './modules/hr-fingerprints/hr-fingerprints.
     SuperAdminModule,
     UserFingerPrintRegisterBackendModule,
     HrFingerprintsModule,
+    DoorUnlockModule,
   ],
   controllers: [AppController, UserFingerPrintRegisterBackendController],
   providers: [AppService, UserFingerPrintRegisterBackendService],

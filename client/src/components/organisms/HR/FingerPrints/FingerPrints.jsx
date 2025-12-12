@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { ReloadOutlined, EyeOutlined, DeleteOutlined, InfoCircleOutlined } from "@ant-design/icons";
+import { ReloadOutlined, EyeOutlined, DeleteOutlined, InfoCircleOutlined, UnlockOutlined } from "@ant-design/icons";
 import Loading from "../../../atoms/loading/loading.jsx";
 import { Pie } from "@ant-design/plots";
-import { Table, ConfigProvider, Modal, Button, Popconfirm, Space, Tooltip, Popover } from "antd";
+import { Table, ConfigProvider, Modal, Button, Popconfirm, Space, Tooltip, Popover, message } from "antd";
 import styles from "./FingerPrints.module.css";
 import axios from "axios";
 import { useAuth } from "../../../../contexts/AuthContext.jsx";
@@ -54,8 +54,45 @@ const FingerPrintsContent = () => {
   const [deviceCards, setDeviceCards] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [searchError, setSearchError] = useState("");
+  const [unlockingDoor, setUnlockingDoor] = useState(false);
   const { authData } = useAuth();
   const { theme } = useTheme();
+
+  // Handle unlock door button click
+  const handleUnlockDoor = async () => {
+    if (!authData?.orgId) {
+      message.error("Organization ID not found");
+      return;
+    }
+
+    console.log('🔓 Unlock button clicked - sending request...');
+    console.log('Organization ID:', authData.orgId);
+    console.log('Admin Name:', authData?.user?.name || "Administrator");
+
+    setUnlockingDoor(true);
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/door-unlock/unlock`,
+        {
+          orgId: authData.orgId,
+          adminName: authData?.user?.name || "Administrator",
+        }
+      );
+
+      console.log('✅ Server response:', response.data);
+
+      if (response.data.success) {
+        message.success("Door unlock command sent successfully!");
+      } else {
+        message.error("Failed to send unlock command");
+      }
+    } catch (error) {
+      console.error("❌ Error unlocking door:", error);
+      message.error("Failed to unlock door: " + (error.response?.data?.message || error.message));
+    } finally {
+      setUnlockingDoor(false);
+    }
+  };
 
   // Fetch fingerprint device usage
   useEffect(() => {
@@ -352,7 +389,18 @@ const FingerPrintsContent = () => {
       <div className={styles.sectors}>
         <div className={styles.tableSection}>
           <div className={styles.container}>
-            <h3 className={styles.unitsTitle}>User Fingerprint Details</h3>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <h3 className={styles.unitsTitle}>User Fingerprint Details</h3>
+              <Button 
+                type="primary" 
+                style={{ backgroundColor: '#970000', borderColor: '#970000' }}
+                icon={<UnlockOutlined />}
+                loading={unlockingDoor}
+                onClick={handleUnlockDoor}
+              >
+                Unlock the Door
+              </Button>
+            </div>
             {/* Search Bar for Employee ID or Name */}
             <div
               className={

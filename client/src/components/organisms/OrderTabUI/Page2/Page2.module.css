@@ -579,3 +579,60 @@
     transform: scale(1) translateY(0);
   }
 }
+
+/* Admin Door Unlock Alert Styles */
+.adminUnlockPopup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(76, 175, 80, 0.15); /* Semi-transparent green */
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  color: #4caf50;
+  padding: 30px 50px;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  z-index: 10000;
+  animation: adminUnlockFadeIn 0.3s ease-out;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.adminUnlockIcon {
+  font-size: 3rem;
+  color: #4caf50;
+  background: rgba(76, 175, 80, 0.2);
+  border-radius: 50%;
+  width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+  box-shadow: 0 4px 16px rgba(76, 175, 80, 0.3);
+}
+
+.adminUnlockText {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #4caf50;
+  margin-bottom: 5px;
+}
+
+@keyframes adminUnlockFadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}

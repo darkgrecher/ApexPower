@@ -142,6 +142,12 @@ class MyCallbacks : public BLECharacteristicCallbacks
         sendBLEMessage("Payment confirmed - LED activated");
         indicatePaymentPaid();
       }
+      else if (rxValue == "UNLOCK_DOOR")
+      {
+        Serial.println("Door unlock command received from administration");
+        sendBLEMessage("Door unlocked by administration - LED activated");
+        indicatePaymentPaid(); // Reuse the LED indication function (turns LED on for 2 seconds)
+      }
       else if (rxValue == "UNIT_NAME")
       {
         String unitMsg = "UnitName: " + String(UNIT_NAME);

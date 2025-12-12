@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Typography, Card, Spin, Dropdown, Menu } from "antd";
 import styles from "./Page2.module.css";
 import DateAndTime from "../DateAndTime/DateAndTime.jsx";
@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import FingerprintBLE from "../../../../utils/fingerprintBLE.js";
 import { useMealData } from "../../../../contexts/MealDataContext.jsx";
 import { useAuth } from "../../../../contexts/AuthContext.jsx";
+import { io } from "socket.io-client";
 
 const Page2 = ({
   carouselRef,
@@ -40,6 +41,102 @@ const Page2 = ({
   const [showFingerprintPopup, setShowFingerprintPopup] = useState(false);
   const [verifiedMessage, setVerifiedMessage] = useState("");
   const [paymentAlert, setPaymentAlert] = useState("");
+  const [adminUnlockAlert, setAdminUnlockAlert] = useState("");
+  const socketRef = useRef(null);
+  const fingerprintBLERef = useRef(null);
+  const fingerprintConnectedRef = useRef(false);
+
+  // Keep refs in sync with state
+  useEffect(() => {
+    fingerprintBLERef.current = fingerprintBLE;
+  }, [fingerprintBLE]);
+
+  useEffect(() => {
+    fingerprintConnectedRef.current = fingerprintConnected;
+  }, [fingerprintConnected]);
+
+  // WebSocket connection for door unlock events from administration
+  useEffect(() => {
+    // Remove /api from baseURL for WebSocket connection
+    const wsBaseURL = baseURL.replace('/api', '');
+    console.log('🔍 Page2 WebSocket effect running...');
+    console.log('🔍 baseURL:', baseURL);
+    console.log('🔍 wsBaseURL:', wsBaseURL);
+
+    // Connect to WebSocket server (NO AUTH REQUIRED - tablet page)
+    const socket = io(`${wsBaseURL}/door-unlock`, {
+      transports: ['websocket', 'polling'],
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
+    });
+
+    socketRef.current = socket;
+
+    socket.on('connect', () => {
+      console.log('✅ Connected to door-unlock WebSocket');
+      console.log('📡 Registering as tablet');
+      // Register this tablet with the server
+      socket.emit('register', {
+        clientType: 'tablet',
+      });
+    });
+
+    socket.on('disconnect', () => {
+      console.log('Disconnected from door-unlock WebSocket');
+    });
+
+    socket.on('connect_error', (error) => {
+      console.log('❌ WebSocket connection error:', error.message);
+    });
+
+    // Listen for unlock door commands from administration
+    socket.on('unlock-door', async (data) => {
+      console.log('🚪 Received unlock-door command from admin:', data);
+      
+      // Use refs to get the current BLE connection state
+      const currentBLE = fingerprintBLERef.current;
+      const isConnected = fingerprintConnectedRef.current;
+      
+      console.log('BLE connection status:', { currentBLE: !!currentBLE, isConnected });
+      
+      // Send BLE command to ESP32 to unlock door (turn on LED)
+      if (currentBLE && isConnected) {
+        try {
+          await currentBLE.sendCommand("UNLOCK_DOOR");
+          console.log('UNLOCK_DOOR command sent to ESP32');
+        } catch (error) {
+          console.error('Failed to send UNLOCK_DOOR command to ESP32:', error);
+        }
+      } else {
+        console.warn('Fingerprint BLE not connected, cannot send unlock command');
+        // Try using window.fingerprintBLEInstance as fallback
+        if (window.fingerprintBLEInstance && window.fingerprintBLEInstance.getConnectionStatus()) {
+          try {
+            await window.fingerprintBLEInstance.sendCommand("UNLOCK_DOOR");
+            console.log('UNLOCK_DOOR command sent to ESP32 via window instance');
+          } catch (error) {
+            console.error('Failed to send UNLOCK_DOOR command via window instance:', error);
+          }
+        }
+      }
+
+      // Show admin unlock alert for 5 seconds
+      const alertMessage = `Door unlocked by ${data.adminName || 'Administration'}`;
+      console.log('🔔 Displaying alert:', alertMessage);
+      setAdminUnlockAlert(alertMessage);
+      setTimeout(() => {
+        console.log('🔕 Clearing alert');
+        setAdminUnlockAlert("");
+      }, 5000);
+    });
+
+    return () => {
+      if (socket) {
+        socket.disconnect();
+      }
+    };
+  }, [baseURL]);
 
   // Manage focus and tabIndex based on whether this slide is active
   useEffect(() => {
@@ -947,6 +1044,15 @@ const Page2 = ({
             <div className={styles.paymentAlertIcon}>⚠️</div>
             <div className={styles.paymentAlertText}>{paymentAlert}</div>
             <div className={styles.paymentAlertSubtext}> Logging out Automatically...</div>
+          </div>
+        </>
+      )}
+      {adminUnlockAlert && (
+        <>
+          <div className={styles.verifiedBackdrop}></div>
+          <div className={styles.adminUnlockPopup}>
+            <div className={styles.adminUnlockIcon}>🔓</div>
+            <div className={styles.adminUnlockText}>{adminUnlockAlert}</div>
           </div>
         </>
       )}
