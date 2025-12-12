@@ -39,6 +39,7 @@ const Page2 = ({
   const [fingerprintBLE, setFingerprintBLE] = useState(null);
   const [showFingerprintPopup, setShowFingerprintPopup] = useState(false);
   const [verifiedMessage, setVerifiedMessage] = useState("");
+  const [paymentAlert, setPaymentAlert] = useState("");
 
   // Manage focus and tabIndex based on whether this slide is active
   useEffect(() => {
@@ -167,6 +168,62 @@ const Page2 = ({
       // The connection will be managed globally
     };
   }, [fingerprintBLE]);
+
+  // Helper function to handle user authentication with payment status checking
+  const handleUserAuthentication = async (user) => {
+    // Check payment status
+    if (!user.paymentStatus) {
+      // Show payment alert
+      setPaymentAlert("Please settle your payment");
+      console.log("Payment required for user:", user.name);
+      
+      // Auto logout after 3 seconds
+      setTimeout(() => {
+        setPaymentAlert("");
+        // Reset all states and return to page 1
+        setPin("");
+        setErrorMessage("");
+        setVerifiedMessage("");
+        setUsername(null);
+        setUserId(null);
+        clearData();
+        carouselRef.current.goTo(1);
+      }, 3000);
+      
+      return false; // Authentication failed due to payment
+    }
+
+    // Payment is settled, proceed with normal authentication
+    setUsername({ name: user.name, gender: user.gender, organizationId: user.organizationId });
+    setUserId(user.id);
+    console.log("Retrieved Username:", user.name);
+    console.log("Retrieved User ID:", user.id);
+    console.log("Retrieved Organization ID:", user.organizationId);
+    console.log("Payment Status:", user.paymentStatus ? "Paid" : "Unpaid");
+    
+    // Show verified message
+    setVerifiedMessage("Verified");
+    setTimeout(() => setVerifiedMessage(""), 1500);
+    
+    // Preload meal data before navigation
+    if (user.organizationId) {
+      console.log("Preloading meal data for organization:", user.organizationId);
+      try {
+        await preloadMealData(user.organizationId, new Date());
+        console.log("Meal data preloaded successfully");
+      } catch (preloadError) {
+        console.error("Error preloading meal data:", preloadError);
+        // Continue with navigation even if preloading fails
+      }
+    }
+    
+    // Navigate to page 3
+    setTimeout(() => {
+      carouselRef.current.goTo(2);
+    }, 100);
+    
+    return true; // Authentication successful
+  };
 
   // Handle BLE data from ESP32
   const handleBLEData = async (data) => {
@@ -442,31 +499,10 @@ const Page2 = ({
         throw new Error("User not found for this employee ID");
       }
       const user = await userResponse.json();
-      setUsername({ name: user.name, gender: user.gender, organizationId: user.organizationId });
-      setUserId(user.id);
-      console.log("Retrieved Username:", user.name);
-      console.log("Retrieved User ID:", user.id);
-      console.log("Retrieved Organization ID:", user.organizationId);
       
-      // Show verified message
-      setVerifiedMessage("Verified");
-      setTimeout(() => setVerifiedMessage(""), 1500);
+      // Use the helper function to handle authentication with payment checking
+      await handleUserAuthentication(user);
       
-      // Preload meal data before navigation
-      if (user.organizationId) {
-        console.log("Preloading meal data for organization:", user.organizationId);
-        try {
-          await preloadMealData(user.organizationId, new Date());
-          console.log("Meal data preloaded successfully");
-        } catch (preloadError) {
-          console.error("Error preloading meal data:", preloadError);
-          // Continue with navigation even if preloading fails
-        }
-      }
-      
-      setTimeout(() => {
-        carouselRef.current.goTo(2);
-      }, 100);
     } catch (error) {
       console.error("Error fetching employee by fingerprint:", error);
       setErrorMessage(text.invalidFingerprint);
@@ -491,31 +527,10 @@ const Page2 = ({
           throw new Error("User not found");
         }
         const user = await response.json();
-        setUsername({ name: user.name, gender: user.gender, organizationId: user.organizationId });
-        setUserId(user.id);
-        console.log("Retrieved Username:", user.name);
-        console.log("Retrieved User ID:", user.id);
-        console.log("Retrieved Organization ID:", user.organizationId);
         
-        // Show verified message
-        setVerifiedMessage("Verified");
-        setTimeout(() => setVerifiedMessage(""), 1500);
+        // Use the helper function to handle authentication with payment checking
+        await handleUserAuthentication(user);
         
-        // Preload meal data before navigation
-        if (user.organizationId) {
-          console.log("Preloading meal data for organization:", user.organizationId);
-          try {
-            await preloadMealData(user.organizationId, new Date());
-            console.log("Meal data preloaded successfully");
-          } catch (preloadError) {
-            console.error("Error preloading meal data:", preloadError);
-            // Continue with navigation even if preloading fails
-          }
-        }
-        
-        setTimeout(() => {
-          carouselRef.current.goTo(2);
-        }, 100);
       } catch (error) {
         console.error("Error fetching user:", error);
         setErrorMessage(text.invalidPin);
@@ -908,6 +923,16 @@ const Page2 = ({
           <div className={styles.verifiedPopup}>
             <div className={styles.verifiedIcon}>✓</div>
             <div>{verifiedMessage}</div>
+          </div>
+        </>
+      )}
+      {paymentAlert && (
+        <>
+          <div className={styles.verifiedBackdrop}></div>
+          <div className={styles.paymentAlertPopup}>
+            <div className={styles.paymentAlertIcon}>⚠️</div>
+            <div className={styles.paymentAlertText}>{paymentAlert}</div>
+            <div className={styles.paymentAlertSubtext}>Logging out in 3 seconds...</div>
           </div>
         </>
       )}
