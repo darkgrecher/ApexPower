@@ -284,4 +284,83 @@ export class UserService {
       throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
+
+  // Update payment status for a single user
+  async updatePaymentStatus(id: string, paymentStatus: boolean) {
+    try {
+      const user = await this.databaseService.user.findUnique({
+        where: { id },
+      });
+      if (!user) {
+        throw new HttpException('User Not found', HttpStatus.NOT_FOUND);
+      }
+
+      await this.databaseService.user.update({
+        where: { id },
+        data: { paymentStatus },
+      });
+      return { message: 'Payment status updated successfully', id, paymentStatus };
+    } catch (err) {
+      throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  // Update payment status for multiple users
+  async updateMultiplePaymentStatus(userIds: string[], paymentStatus: boolean) {
+    try {
+      const result = await this.databaseService.user.updateMany({
+        where: { id: { in: userIds } },
+        data: { paymentStatus },
+      });
+      return { 
+        message: 'Payment status updated successfully', 
+        updatedCount: result.count, 
+        paymentStatus 
+      };
+    } catch (err) {
+      throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  // Update payment status for all users in an organization
+  async updatePaymentStatusByOrg(orgId: string, paymentStatus: boolean) {
+    try {
+      const result = await this.databaseService.user.updateMany({
+        where: { organizationId: orgId },
+        data: { paymentStatus },
+      });
+      return { 
+        message: 'Payment status updated successfully for all users in organization', 
+        updatedCount: result.count, 
+        paymentStatus 
+      };
+    } catch (err) {
+      throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  // Get users by payment status
+  async getUsersByPaymentStatus(paymentStatus: boolean, orgId?: string) {
+    try {
+      const where: any = { paymentStatus };
+      if (orgId) {
+        where.organizationId = orgId;
+      }
+
+      const users = await this.databaseService.user.findMany({
+        where,
+        select: {
+          id: true,
+          empNo: true,
+          name: true,
+          email: true,
+          paymentStatus: true,
+          organizationId: true,
+        },
+      });
+      return users;
+    } catch (err) {
+      throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
 }

@@ -256,6 +256,23 @@ const FingerPrintsContent = () => {
       render: (count, record) => (record.status === "Registered" ? count : "-"),
     },
     {
+      title: "Payment Status",
+      dataIndex: "paymentStatus",
+      key: "paymentStatus",
+      align: "center",
+      ellipsis: true,
+      render: (paymentStatus) => (
+        <span
+          style={{
+            color: paymentStatus ? "#52c41a" : "#ff4d4f",
+            fontWeight: "600",
+          }}
+        >
+          {paymentStatus ? "Paid" : "Unpaid"}
+        </span>
+      ),
+    },
+    {
       title: "Actions",
       key: "actions",
       align: "center",

@@ -239,5 +239,131 @@ async getIdByEmpNoAndOrg(
   }
 }
 
+// Update payment status for a single user
+@Put(':id/payment-status')
+@UseGuards(AuthGuard('jwt'), RolesGuard)
+@Roles('HR_ADMIN')
+async updatePaymentStatus(
+  @Param('id') id: string,
+  @Body() body: { paymentStatus: boolean }
+) {
+  try {
+    return await this.userService.updatePaymentStatus(id, body.paymentStatus);
+  } catch (err) {
+    throw new HttpException(
+      {
+        status: HttpStatus.BAD_REQUEST,
+        error: 'Bad Request',
+        message: err.message,
+      },
+      HttpStatus.BAD_REQUEST,
+    );
+  }
+}
+
+// Update payment status for a single user (NO AUTH - TESTING ONLY)
+@Put(':id/payment-status-test')
+async updatePaymentStatusTest(
+  @Param('id') id: string,
+  @Body() body: { paymentStatus: boolean }
+) {
+  try {
+    return await this.userService.updatePaymentStatus(id, body.paymentStatus);
+  } catch (err) {
+    throw new HttpException(
+      {
+        status: HttpStatus.BAD_REQUEST,
+        error: 'Bad Request',
+        message: err.message,
+      },
+      HttpStatus.BAD_REQUEST,
+    );
+  }
+}
+
+// Update payment status for multiple users
+@Put('payment-status/bulk')
+@UseGuards(AuthGuard('jwt'), RolesGuard)
+@Roles('HR_ADMIN')
+async updateMultiplePaymentStatus(
+  @Body() body: { userIds: string[]; paymentStatus: boolean }
+) {
+  try {
+    return await this.userService.updateMultiplePaymentStatus(body.userIds, body.paymentStatus);
+  } catch (err) {
+    throw new HttpException(
+      {
+        status: HttpStatus.BAD_REQUEST,
+        error: 'Bad Request',
+        message: err.message,
+      },
+      HttpStatus.BAD_REQUEST,
+    );
+  }
+}
+
+// Update payment status for multiple users (NO AUTH - TESTING ONLY)
+@Put('payment-status/bulk-test')
+async updateMultiplePaymentStatusTest(
+  @Body() body: { userIds: string[]; paymentStatus: boolean }
+) {
+  try {
+    return await this.userService.updateMultiplePaymentStatus(body.userIds, body.paymentStatus);
+  } catch (err) {
+    throw new HttpException(
+      {
+        status: HttpStatus.BAD_REQUEST,
+        error: 'Bad Request',
+        message: err.message,
+      },
+      HttpStatus.BAD_REQUEST,
+    );
+  }
+}
+
+// Update payment status for all users in an organization
+@Put('organization/:orgId/payment-status')
+@UseGuards(AuthGuard('jwt'), RolesGuard)
+@Roles('HR_ADMIN')
+async updatePaymentStatusByOrg(
+  @Param('orgId') orgId: string,
+  @Body() body: { paymentStatus: boolean }
+) {
+  try {
+    return await this.userService.updatePaymentStatusByOrg(orgId, body.paymentStatus);
+  } catch (err) {
+    throw new HttpException(
+      {
+        status: HttpStatus.BAD_REQUEST,
+        error: 'Bad Request',
+        message: err.message,
+      },
+      HttpStatus.BAD_REQUEST,
+    );
+  }
+}
+
+// Get users by payment status
+@Get('payment-status/:status')
+@UseGuards(AuthGuard('jwt'), RolesGuard)
+async getUsersByPaymentStatus(
+  @Param('status') status: string,
+  @Query('orgId') orgId?: string
+) {
+  try {
+    const paymentStatus = status === 'paid' ? true : false;
+    return await this.userService.getUsersByPaymentStatus(paymentStatus, orgId);
+  } catch (err) {
+    throw new HttpException(
+      {
+        status: HttpStatus.BAD_REQUEST,
+        error: 'Bad Request',
+        message: err.message,
+      },
+      HttpStatus.BAD_REQUEST,
+    );
+  }
+}
+
 
 }

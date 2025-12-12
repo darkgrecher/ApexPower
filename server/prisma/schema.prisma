@@ -50,6 +50,7 @@ model User {
   email          String        @unique
   salary         Int?
   passkey        Int?
+  paymentStatus Boolean     @default(false)
   passkeyRegeneratedBy String?
   passkeyRegeneratedAt DateTime?
   supId          String?

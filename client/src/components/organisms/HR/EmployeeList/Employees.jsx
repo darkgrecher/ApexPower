@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
-import { Table, Space, Modal, ConfigProvider, Select, Popconfirm } from "antd";
+import { Table, Space, Modal, ConfigProvider, Select, Popconfirm, Dropdown, Button } from "antd";
 import { FiEdit } from "react-icons/fi";
 import { MdOutlineDeleteOutline } from "react-icons/md";
+import { DownOutlined } from "@ant-design/icons";
 import EditModal from "../../../templates/HR/EditModal/EditModal.jsx";
 import Loading from "../../../atoms/loading/loading.jsx";
 import styles from "./Employee.module.css";
@@ -103,6 +104,7 @@ const Employees = () => {
         name: emp.name,
         role: emp.role,
         email: emp.email,
+        paymentStatus: emp.paymentStatus,
       }));
       setEmployee(fetchedEmployee);
       setLoading(false);
@@ -144,6 +146,35 @@ const Employees = () => {
       error("Something went Wrong!");
     }
     setLoading(false);
+  };
+
+  const handlePaymentStatusUpdate = async (userId, newPaymentStatus) => {
+    try {
+      setLoading(true);
+      await axios.put(
+        `${urL}/user/${userId}/payment-status`,
+        { paymentStatus: newPaymentStatus },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      
+      // Update the local state to reflect the change immediately
+      setEmployee(prevEmployees =>
+        prevEmployees.map(emp =>
+          emp.id === userId ? { ...emp, paymentStatus: newPaymentStatus } : emp
+        )
+      );
+      
+      success(`Payment status updated to ${newPaymentStatus ? 'Paid' : 'Unpaid'}`);
+    } catch (err) {
+      console.log(err);
+      error("Failed to update payment status!");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -237,20 +268,83 @@ const Employees = () => {
       }),
     },
     {
+      title: "Payment Status",
+      dataIndex: "paymentStatus",
+      key: "paymentStatus",
+      align: "center",
+      ellipsis: true,
+      render: (paymentStatus) => (
+        <span
+          style={{
+            color: paymentStatus ? "#52c41a" : "#ff4d4f",
+            fontWeight: "600",
+          }}
+        >
+          {paymentStatus ? "Paid" : "Unpaid"}
+        </span>
+      ),
+      onHeaderCell: () => ({
+        className: styles.tableHeaderCell,
+      }),
+    },
+    {
       title: "Actions",
       key: "actions",
       align: "center",
       render: (_, record) => {
         // Hide delete button if this is the logged-in user
         const isCurrentUser = record.id === authData?.user?.id;
+        
+        // Payment status dropdown menu items
+        const paymentMenuItems = [
+          {
+            key: 'paid',
+            label: (
+              <span style={{ color: '#52c41a', fontWeight: '600' }}>
+                Mark as Paid
+              </span>
+            ),
+            onClick: () => handlePaymentStatusUpdate(record.id, true),
+          },
+          {
+            key: 'unpaid',
+            label: (
+              <span style={{ color: '#ff4d4f', fontWeight: '600' }}>
+                Mark as Unpaid
+              </span>
+            ),
+            onClick: () => handlePaymentStatusUpdate(record.id, false),
+          },
+        ];
+
         return (
-          <Space size="middle">
+          <Space size="small">
             <FiEdit
               onClick={() => openModal(record.id)}
               className={styles.icons}
               color={theme === "dark" ? "#ffffff" : "black"}
               size="15px"
+              title="Edit User"
             />
+            
+            <Dropdown
+              menu={{ items: paymentMenuItems }}
+              placement="bottomRight"
+              trigger={['click']}
+            >
+              <Button 
+                size="small" 
+                type="text"
+                style={{
+                  color: theme === "dark" ? "#ffffff" : "#1890ff",
+                  fontWeight: "500",
+                  fontSize: "12px"
+                }}
+              >
+                Payment <DownOutlined />
+              </Button>
+            </Dropdown>
+            
             {!isCurrentUser && (
               <Popconfirm
                 title={
@@ -296,6 +390,7 @@ const Employees = () => {
                   color={theme === "dark" ? "white" : "red"}
                   className={styles.icons}
                   size="17px"
+                  title="Delete User"
                 />
               </Popconfirm>
             )}
