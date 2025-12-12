@@ -188,7 +188,7 @@ const Page2 = ({
         setUserId(null);
         clearData();
         carouselRef.current.goTo(1);
-      }, 3000);
+      }, 5000);
 
       return false; // Authentication failed due to payment
     }
@@ -946,7 +946,7 @@ const Page2 = ({
           <div className={styles.paymentAlertPopup}>
             <div className={styles.paymentAlertIcon}>⚠️</div>
             <div className={styles.paymentAlertText}>{paymentAlert}</div>
-            <div className={styles.paymentAlertSubtext}>Logging out in 3 seconds...</div>
+            <div className={styles.paymentAlertSubtext}> Logging out Automatically...</div>
           </div>
         </>
       )}
