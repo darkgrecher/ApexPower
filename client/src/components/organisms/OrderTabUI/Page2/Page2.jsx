@@ -851,7 +851,7 @@ const Page2 = ({
       <div className={styles.full}>
         <div>
           <Typography.Title level={1} className={styles.mainTitle1}>
-            Welcome to <span>Biz</span> Food Ordering
+            Welcome to <span> Apex</span> Power
           </Typography.Title>
         </div>
         <div className={styles.dateAndTime}>
@@ -1043,7 +1043,7 @@ const Page2 = ({
           <div className={styles.paymentAlertPopup}>
             <div className={styles.paymentAlertIcon}>⚠️</div>
             <div className={styles.paymentAlertText}>{paymentAlert}</div>
-            <div className={styles.paymentAlertSubtext}> Logging out Automatically...</div>
+            <div className={styles.paymentAlertSubtext}> Closing in 5 seconds Automatically...</div>
           </div>
         </>
       )}
