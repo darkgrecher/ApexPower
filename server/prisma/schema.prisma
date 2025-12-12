@@ -17,52 +17,53 @@ datasource db {
 }
 
 model Organization {
-  id                      String   @id
-  name                    String   @unique
-  contactNumber           String?  
-  address                 String? 
-  contactEmail            String
-  createdAt               DateTime @default(now())
-  updatedAt               DateTime @updatedAt
-  users                   User[]
-  fingerprints                Fingerprint[]
-  meals                       Meal[]
-  orders                      Order[]
-  mealTypes                   MealType[]
-  ScheduledMeals             ScheduledMeal[]
+  id             String          @id
+  name           String          @unique
+  contactNumber  String?
+  address        String?
+  contactEmail   String
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  users          User[]
+  fingerprints   Fingerprint[]
+  meals          Meal[]
+  orders         Order[]
+  mealTypes      MealType[]
+  ScheduledMeals ScheduledMeal[]
 }
 
 model Fingerprint {
-  thumbid String @id
+  thumbid String       @id
   orgId   String
   empId   String
-  org      Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  org     Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
 }
 
 model User {
-  id             String        @id
-  empNo          String
-  name           String
-  role           String
-  dob            String?
-  telephone      String?
-  gender         Gender
-  address        String?
-  email          String        @unique
-  salary         Int?
-  passkey        Int?
-  paymentStatus Boolean     @default(false)
+  id                   String           @id
+  empNo                String
+  name                 String
+  role                 String
+  dob                  String?
+  telephone            String?
+  gender               Gender
+  address              String?
+  email                String           @unique
+  salary               Int?
+  passkey              Int?
+  paymentStatus        Boolean          @default(false)
   passkeyRegeneratedBy String?
   passkeyRegeneratedAt DateTime?
-  supId          String?
-  language       String?
-  height         Int?
-  weight         Int?
-  organizationId String
-  organization   Organization @relation(fields: [organizationId], references: [id],onDelete: Cascade)
-  permissions    Permission[]
-  userPermissions UserPermission[]
-  createdAt      DateTime      @default(now())
+  supId                String?
+  language             String?
+  height               Int?
+  weight               Int?
+  organizationId       String
+  organization         Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  permissions          Permission[]
+  userPermissions      UserPermission[]
+  createdAt            DateTime         @default(now())
+
   @@unique([empNo, organizationId])
 }
 
@@ -74,75 +75,74 @@ enum Gender {
 
 // Permission model
 model Permission {
-  id        String   @id @default(uuid())
-  orgId     String
-  action    String
-  role      String
-  users     User[] // For direct user permissions
+  id              String           @id @default(uuid())
+  orgId           String
+  action          String
+  role            String
+  users           User[] // For direct user permissions
   userPermissions UserPermission[]
-  createdAt DateTime @default(now())
+  createdAt       DateTime         @default(now())
 }
 
 model UserPermission {
-  id           Int         @id @default(autoincrement())
+  id           Int        @id @default(autoincrement())
   userId       String
   permissionId String
-  user         User        @relation(fields: [userId], references: [id])
-  permission   Permission  @relation(fields: [permissionId], references: [id])
+  user         User       @relation(fields: [userId], references: [id])
+  permission   Permission @relation(fields: [permissionId], references: [id])
 
   @@unique([userId, permissionId])
 }
 
 model Meal {
-  id          Int              @id @default(autoincrement())
-  orgId       String
-  nameEnglish String
-  nameSinhala String
-  nameTamil   String
-  description String?
-  isDeleted Boolean  @default(false)
-  price       Float
-  imageUrl    String?
-  category    String[]
-  createdAt   DateTime         @default(now())
-  schedules   ScheduledMeal[]
-  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  id           Int             @id @default(autoincrement())
+  orgId        String
+  nameEnglish  String
+  nameSinhala  String
+  nameTamil    String
+  description  String?
+  isDeleted    Boolean         @default(false)
+  price        Float
+  imageUrl     String?
+  category     String[]
+  createdAt    DateTime        @default(now())
+  schedules    ScheduledMeal[]
+  organization Organization    @relation(fields: [orgId], references: [id], onDelete: Cascade)
 }
 
 model Order {
-  id              Int      @id @default(autoincrement())
+  id              Int          @id @default(autoincrement())
   employeeId      String
   orgId           String
   mealTypeId      Int
   meals           String[] // Array of meal IDs
-  orderDate       DateTime @db.Date
-  orderPlacedTime DateTime @default(now()) // Store the exact time the order was placed in Sri Lankan time zone
+  orderDate       DateTime     @db.Date
+  orderPlacedTime DateTime     @default(now()) // Store the exact time the order was placed in Sri Lankan time zone
   price           Float
-  serve           Boolean  @default(false)
-  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  serve           Boolean      @default(false)
+  organization    Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
 }
 
 model ScheduledMeal {
-  id         Int      @id @default(autoincrement())
-  orgId      String
-  date       DateTime @db.Date
-  mealTypeId Int
-  mealType   MealType @relation(fields: [mealTypeId], references: [id], onDelete: Cascade)
-  meals      Meal[]
+  id           Int          @id @default(autoincrement())
+  orgId        String
+  date         DateTime     @db.Date
+  mealTypeId   Int
+  mealType     MealType     @relation(fields: [mealTypeId], references: [id], onDelete: Cascade)
+  meals        Meal[]
   organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
 
   @@unique([date, mealTypeId])
 }
 
-
 model MealType {
-  id        Int             @id @default(autoincrement())
-  name      String // "Breakfast", "Lunch", "Dinner", or custom names
-  orgId     String
-  time      String[] // Optional time in HH:MM format
-  isDefault Boolean         @default(false) // To mark system defaults
-  isDeleted Boolean  @default(false)
-  schedules ScheduledMeal[]
-  date      DateTime
-  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  id           Int             @id @default(autoincrement())
+  name         String // "Breakfast", "Lunch", "Dinner", or custom names
+  orgId        String
+  time         String[] // Optional time in HH:MM format
+  isDefault    Boolean         @default(false) // To mark system defaults
+  isDeleted    Boolean         @default(false)
+  schedules    ScheduledMeal[]
+  date         DateTime
+  organization Organization    @relation(fields: [orgId], references: [id], onDelete: Cascade)
 }
