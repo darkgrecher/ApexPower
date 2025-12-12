@@ -76,27 +76,27 @@ const EmployeePage = () => {
       icon: <FontAwesomeIcon icon={faFingerprint} />,
       link: "/FingerPrint",
     },
-    {
-      key: "5",
-      label: "Schedule",
-      action: "Meal Management",
-      icon: <FontAwesomeIcon icon={faCalendar} />,
-      link: "/kitchen-admin",
-    },
-    {
-      key: "6",
-      label: "Meal",
-      action: "Meal Management",
-      icon: <FontAwesomeIcon icon={faBowlFood} />,
-      link: "/kitchen-meal",
-    },
-    {
-      key: "7",
-      label: "Reports & Analysis",
-      action: "Reports",
-      icon: <FontAwesomeIcon icon={faChartLine} />,
-      link: "/kitchen-report",
-    },
+    // {
+    //   key: "5",
+    //   label: "Schedule",
+    //   action: "Meal Management",
+    //   icon: <FontAwesomeIcon icon={faCalendar} />,
+    //   link: "/kitchen-admin",
+    // },
+    // {
+    //   key: "6",
+    //   label: "Meal",
+    //   action: "Meal Management",
+    //   icon: <FontAwesomeIcon icon={faBowlFood} />,
+    //   link: "/kitchen-meal",
+    // },
+    // {
+    //   key: "7",
+    //   label: "Reports & Analysis",
+    //   action: "Reports",
+    //   icon: <FontAwesomeIcon icon={faChartLine} />,
+    //   link: "/kitchen-report",
+    // },
   ];
 
   const filteredMenuItems = allMenuItems.filter(item =>

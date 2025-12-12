@@ -40,27 +40,27 @@ const FingerPrintPage = () => {
       icon: <FontAwesomeIcon icon={faFingerprint} />,
       link: "/FingerPrint",
     },
-    {
-      key: "4",
-      label: "Schedule",
-      action: "Meal Management",
-      icon: <FontAwesomeIcon icon={faCalendar} />,
-      link: "/kitchen-admin",
-    },
-    {
-      key: "5",
-      label: "Meal",
-      action: "Meal Management",
-      icon: <FontAwesomeIcon icon={faBowlFood} />,
-      link: "/kitchen-meal",
-    },
-    {
-      key: "6",
-      label: "Reports & Analysis",
-      action: "Reports",
-      icon: <FontAwesomeIcon icon={faChartLine} />,
-      link: "/kitchen-report",
-    },
+    // {
+    //   key: "4",
+    //   label: "Schedule",
+    //   action: "Meal Management",
+    //   icon: <FontAwesomeIcon icon={faCalendar} />,
+    //   link: "/kitchen-admin",
+    // },
+    // {
+    //   key: "5",
+    //   label: "Meal",
+    //   action: "Meal Management",
+    //   icon: <FontAwesomeIcon icon={faBowlFood} />,
+    //   link: "/kitchen-meal",
+    // },
+    // {
+    //   key: "6",
+    //   label: "Reports & Analysis",
+    //   action: "Reports",
+    //   icon: <FontAwesomeIcon icon={faChartLine} />,
+    //   link: "/kitchen-report",
+    // },
   ];
   // Filter menu based on permissions
   const filteredMenuItems = allMenuItems.filter((item) =>
