@@ -2,9 +2,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
 export default defineConfig({
-  plugins: [
-    react(),
-  ],
+  plugins: [react()],
   server: {
     host: "0.0.0.0",
     port: 5173,
@@ -35,7 +33,7 @@ export default defineConfig({
       output: {
         // Disable manual chunking completely for now
         // manualChunks: undefined,
-        
+
         chunkFileNames: "assets/js/[name]-[hash].js",
         entryFileNames: "assets/js/[name]-[hash].js",
         assetFileNames: (assetInfo) => {
@@ -60,10 +58,6 @@ export default defineConfig({
   },
 
   optimizeDeps: {
-    include: [
-      "react",
-      "react-dom",
-      "react-router-dom",
-    ],
+    include: ["react", "react-dom", "react-router-dom"],
   },
 });
