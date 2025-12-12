@@ -201,6 +201,20 @@ const Page2 = ({
     console.log("Retrieved Organization ID:", user.organizationId);
     console.log("Payment Status:", user.paymentStatus ? "Paid" : "Unpaid");
 
+    // Trigger LED indication for paid users via BLE
+    if (user.paymentStatus && (fingerprintBLE || window.fingerprintBLEInstance)) {
+      try {
+        const bleInstance = fingerprintBLE || window.fingerprintBLEInstance;
+        if (bleInstance && bleInstance.getConnectionStatus()) {
+          console.log("Sending PAYMENT_PAID command to ESP32");
+          await bleInstance.sendCommand("PAYMENT_PAID");
+        }
+      } catch (error) {
+        console.error("Error sending LED command to ESP32:", error);
+        // Continue with authentication even if LED command fails
+      }
+    }
+
     // Show verified message
     setVerifiedMessage("Verified");
     setTimeout(() => setVerifiedMessage(""), 1500);
