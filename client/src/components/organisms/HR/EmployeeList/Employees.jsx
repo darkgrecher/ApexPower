@@ -160,14 +160,14 @@ const Employees = () => {
           },
         }
       );
-      
+
       // Update the local state to reflect the change immediately
       setEmployee(prevEmployees =>
         prevEmployees.map(emp =>
           emp.id === userId ? { ...emp, paymentStatus: newPaymentStatus } : emp
         )
       );
-      
+
       success(`Payment status updated to ${newPaymentStatus ? 'Paid' : 'Unpaid'}`);
     } catch (err) {
       console.log(err);
@@ -190,52 +190,52 @@ const Employees = () => {
   }
 
   const columns = [
-{
-    title: "Employee No",
-    dataIndex: "no",
-    key: "no",
-    align: "center",
-    sorter: (a, b) => {
-      // Extract alphabetic and numeric parts
-      const parseEmpNo = (empNo) => {
-        const match = empNo.match(/^([A-Za-z]*)(\d+)$/);
-        if (match) {
+    {
+      title: "Employee No",
+      dataIndex: "no",
+      key: "no",
+      align: "center",
+      sorter: (a, b) => {
+        // Extract alphabetic and numeric parts
+        const parseEmpNo = (empNo) => {
+          const match = empNo.match(/^([A-Za-z]*)(\d+)$/);
+          if (match) {
+            return {
+              alpha: match[1] || '',
+              numeric: parseInt(match[2], 10)
+            };
+          }
+          // Fallback for pure numbers
+          const numMatch = empNo.match(/^\d+$/);
+          if (numMatch) {
+            return {
+              alpha: '',
+              numeric: parseInt(empNo, 10)
+            };
+          }
+          // Fallback for anything else
           return {
-            alpha: match[1] || '',
-            numeric: parseInt(match[2], 10)
+            alpha: empNo,
+            numeric: 0
           };
-        }
-        // Fallback for pure numbers
-        const numMatch = empNo.match(/^\d+$/);
-        if (numMatch) {
-          return {
-            alpha: '',
-            numeric: parseInt(empNo, 10)
-          };
-        }
-        // Fallback for anything else
-        return {
-          alpha: empNo,
-          numeric: 0
         };
-      };
 
-      const aParsed = parseEmpNo(a.no);
-      const bParsed = parseEmpNo(b.no);
+        const aParsed = parseEmpNo(a.no);
+        const bParsed = parseEmpNo(b.no);
 
-      // First sort by alphabetic part
-      if (aParsed.alpha !== bParsed.alpha) {
-        return aParsed.alpha.localeCompare(bParsed.alpha);
-      }
-      
-      // Then sort by numeric part
-      return aParsed.numeric - bParsed.numeric;
+        // First sort by alphabetic part
+        if (aParsed.alpha !== bParsed.alpha) {
+          return aParsed.alpha.localeCompare(bParsed.alpha);
+        }
+
+        // Then sort by numeric part
+        return aParsed.numeric - bParsed.numeric;
+      },
+      ellipsis: true,
+      onHeaderCell: () => ({
+        className: styles.tableHeaderCell,
+      }),
     },
-    ellipsis: true,
-    onHeaderCell: () => ({
-      className: styles.tableHeaderCell,
-    }),
-  },
     {
       title: "Name",
       dataIndex: "name",
@@ -294,7 +294,7 @@ const Employees = () => {
       render: (_, record) => {
         // Hide delete button if this is the logged-in user
         const isCurrentUser = record.id === authData?.user?.id;
-        
+
         // Payment status dropdown menu items
         const paymentMenuItems = [
           {
@@ -326,14 +326,14 @@ const Employees = () => {
               size="15px"
               title="Edit User"
             />
-            
+
             <Dropdown
               menu={{ items: paymentMenuItems }}
               placement="bottomRight"
               trigger={['click']}
             >
-              <Button 
-                size="small" 
+              <Button
+                size="small"
                 type="text"
                 style={{
                   color: theme === "dark" ? "#ffffff" : "#1890ff",
@@ -344,14 +344,13 @@ const Employees = () => {
                 Payment <DownOutlined />
               </Button>
             </Dropdown>
-            
+
             {!isCurrentUser && (
               <Popconfirm
                 title={
                   <span
-                    className={`${styles.popconfirmTitle} ${
-                      theme === "dark" ? styles.darkPopconfirmTitle : ""
-                    }`}
+                    className={`${styles.popconfirmTitle} ${theme === "dark" ? styles.darkPopconfirmTitle : ""
+                      }`}
                   >
                     Delete User {record.id}
                   </span>
@@ -360,27 +359,24 @@ const Employees = () => {
                 onConfirm={() => handleDelete(record.id, record.email)}
                 description={
                   <span
-                    className={`${styles.popconfirmDescription} ${
-                      theme === "dark" ? styles.darkPopconfirmDescription : ""
-                    }`}
+                    className={`${styles.popconfirmDescription} ${theme === "dark" ? styles.darkPopconfirmDescription : ""
+                      }`}
                   >
                     Are You Sure to Delete
                   </span>
                 }
                 okText={
                   <span
-                    className={`${styles.popconfirmButton} ${
-                      theme === "dark" ? styles.darkPopconfirmButton : ""
-                    }`}
+                    className={`${styles.popconfirmButton} ${theme === "dark" ? styles.darkPopconfirmButton : ""
+                      }`}
                   >
                     Yes
                   </span>
                 }
                 cancelText={
                   <span
-                    className={`${styles.popconfirmButton} ${
-                      theme === "dark" ? styles.darkPopconfirmButton : ""
-                    }`}
+                    className={`${styles.popconfirmButton} ${theme === "dark" ? styles.darkPopconfirmButton : ""
+                      }`}
                   >
                     No
                   </span>
@@ -468,12 +464,10 @@ const Employees = () => {
                 dataSource={employee}
                 rowClassName={(record, index) =>
                   theme === "dark"
-                    ? `${styles.customTableRowDark} ${
-                        index % 2 === 0 ? styles.evenRowDark : styles.oddRowDark
-                      }`
-                    : `${styles.customTableRow} ${
-                        index % 2 === 0 ? styles.evenRow : styles.oddRow
-                      }`
+                    ? `${styles.customTableRowDark} ${index % 2 === 0 ? styles.evenRowDark : styles.oddRowDark
+                    }`
+                    : `${styles.customTableRow} ${index % 2 === 0 ? styles.evenRow : styles.oddRow
+                    }`
                 }
                 pagination={{
                   position: ["bottomCenter"],

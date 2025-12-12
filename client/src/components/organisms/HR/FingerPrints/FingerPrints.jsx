@@ -132,12 +132,12 @@ const FingerPrintsContent = () => {
       prev.map((user) =>
         user.id === modalEmpId
           ? {
-              ...user,
-              fingerprintCount: user.fingerprintCount - 1,
-              thumbids: user.thumbids.filter((id) => id !== thumbid),
-              status:
-                user.fingerprintCount - 1 > 0 ? "Registered" : "Unregistered",
-            }
+            ...user,
+            fingerprintCount: user.fingerprintCount - 1,
+            thumbids: user.thumbids.filter((id) => id !== thumbid),
+            status:
+              user.fingerprintCount - 1 > 0 ? "Registered" : "Unregistered",
+          }
           : user
       )
     );
@@ -204,14 +204,13 @@ const FingerPrintsContent = () => {
                 setRegeneratingId(record.id);
                 try {
                   const res = await axios.put(
-                    `${import.meta.env.VITE_BASE_URL}/user/${
-                      record.id
+                    `${import.meta.env.VITE_BASE_URL}/user/${record.id
                     }/regenerate-passkey`,
                     { adminId: authData?.user?.id },
                     { headers: { Authorization: `Bearer ${authData?.accessToken}` } }
                   );
                   const newPasskey = res.data.passkey;
-                  
+
                   // Refresh the entire table data to get updated tracking information
                   await fetchUserData();
                   setRegeneratingId(null);
@@ -235,12 +234,10 @@ const FingerPrintsContent = () => {
         <span
           className={
             status === "Registered"
-              ? `${styles.registered} ${
-                  theme === "dark" ? styles.registeredDark : ""
-                }`
-              : `${styles.pending} ${
-                  theme === "dark" ? styles.pendingDark : ""
-                }`
+              ? `${styles.registered} ${theme === "dark" ? styles.registeredDark : ""
+              }`
+              : `${styles.pending} ${theme === "dark" ? styles.pendingDark : ""
+              }`
           }
         >
           {status}
@@ -422,14 +419,14 @@ const FingerPrintsContent = () => {
                 dataSource={
                   searchValue && !searchError
                     ? userData
-                        .filter((user) => {
-                          const val = searchValue.trim().toLowerCase();
-                          return (
-                            user.id.toLowerCase() === val ||
-                            user.name.toLowerCase().includes(val)
-                          );
-                        })
-                        .map((user) => ({ ...user, key: user.id }))
+                      .filter((user) => {
+                        const val = searchValue.trim().toLowerCase();
+                        return (
+                          user.id.toLowerCase() === val ||
+                          user.name.toLowerCase().includes(val)
+                        );
+                      })
+                      .map((user) => ({ ...user, key: user.id }))
                     : userData.map((user) => ({ ...user, key: user.id }))
                 }
                 loading={loading}
@@ -442,12 +439,10 @@ const FingerPrintsContent = () => {
                 }}
                 rowClassName={(record, index) =>
                   theme === "dark"
-                    ? `${styles.customTableRowDark} ${
-                        index % 2 === 0 ? styles.evenRowDark : styles.oddRowDark
-                      }`
-                    : `${styles.customTableRow} ${
-                        index % 2 === 0 ? styles.evenRow : styles.oddRow
-                      }`
+                    ? `${styles.customTableRowDark} ${index % 2 === 0 ? styles.evenRowDark : styles.oddRowDark
+                    }`
+                    : `${styles.customTableRow} ${index % 2 === 0 ? styles.evenRow : styles.oddRow
+                    }`
                 }
               />
             </ConfigProvider>
