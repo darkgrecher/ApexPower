@@ -93,13 +93,13 @@ const Page2 = ({
     // Listen for unlock door commands from administration
     socket.on('unlock-door', async (data) => {
       console.log('🚪 Received unlock-door command from admin:', data);
-      
+
       // Use refs to get the current BLE connection state
       const currentBLE = fingerprintBLERef.current;
       const isConnected = fingerprintConnectedRef.current;
-      
+
       console.log('BLE connection status:', { currentBLE: !!currentBLE, isConnected });
-      
+
       // Send BLE command to ESP32 to unlock door (turn on LED)
       if (currentBLE && isConnected) {
         try {
@@ -596,7 +596,12 @@ const Page2 = ({
         headers
       });
       if (!response.ok) {
-        throw new Error("Fingerprint not found");
+        // Handle fingerprint not found (400 or 404)
+        console.error(`Fingerprint ${fingerId} not found in system (Status: ${response.status})`);
+        setErrorMessage("❌ Faild Scan. Please try again.");
+        setTimeout(() => setErrorMessage(""), 3000);
+        setScanning(false);
+        return;
       }
       const fingerprint = await response.json();
       const empId = fingerprint.empId;
@@ -616,8 +621,8 @@ const Page2 = ({
 
     } catch (error) {
       console.error("Error fetching employee by fingerprint:", error);
-      setErrorMessage(text.invalidFingerprint);
-      setTimeout(() => setErrorMessage(""), 2000);
+      setErrorMessage("⚠️ Scan failed. Please try again.");
+      setTimeout(() => setErrorMessage(""), 3000);
       setScanning(false);
     }
   };

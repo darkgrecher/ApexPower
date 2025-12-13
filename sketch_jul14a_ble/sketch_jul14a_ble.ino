@@ -153,6 +153,7 @@ class MyCallbacks : public BLECharacteristicCallbacks
         String unitMsg = "UnitName: " + String(UNIT_NAME);
         Serial.println(unitMsg);
         sendBLEMessage(unitMsg);
+        sendTemplateIDs();
       }
     }
   }
