@@ -587,14 +587,9 @@ const Page2 = ({
   // Fetch employee ID by thumbid (fingerprint ID) and set username for Page3
   const fetchUserByFingerprintId = async (fingerId) => {
     try {
-      const headers = {};
-      if (authData?.accessToken) {
-        headers.Authorization = `Bearer ${authData.accessToken}`;
-      }
-
-      const response = await fetch(`${baseURL}/user-finger-print-register-backend/fingerprint?thumbid=${fingerId}`, {
-        headers
-      });
+      // No authentication needed for tablet fingerprint authentication
+      const response = await fetch(`${baseURL}/user-finger-print-register-backend/fingerprint?thumbid=${fingerId}`);
+      
       if (!response.ok) {
         // Handle fingerprint not found (400 or 404)
         console.error(`Fingerprint ${fingerId} not found in system (Status: ${response.status})`);
@@ -603,17 +598,21 @@ const Page2 = ({
         setScanning(false);
         return;
       }
+      
       const fingerprint = await response.json();
       const empId = fingerprint.empId;
+      
       if (!empId) {
         throw new Error("No employee ID found for this fingerprint");
       }
-      const userResponse = await fetch(`${baseURL}/user/${empId}`, {
-        headers
-      });
+      
+      // Use public endpoint that doesn't require authentication for tablet login
+      const userResponse = await fetch(`${baseURL}/user/public/${empId}`);
+      
       if (!userResponse.ok) {
         throw new Error("User not found for this employee ID");
       }
+      
       const user = await userResponse.json();
 
       // Use the helper function to handle authentication with payment checking

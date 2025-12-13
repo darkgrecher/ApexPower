@@ -173,6 +173,22 @@ export class UserController {
     }
   }
 
+  @Get('public/:id')
+  async findOnePublic(@Param('id') id: string) {
+    try {
+      return await this.userService.findOne(id);
+    } catch (err) {
+      throw new HttpException(
+        {
+          status: HttpStatus.NOT_FOUND,
+          error: 'Not Found',
+          message: err.message,
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+  }
+
   @Get(':id/org/:orgId/name')
   // @UseGuards(AuthGuard('jwt'))
   async getUserNameByIdAndOrg(
