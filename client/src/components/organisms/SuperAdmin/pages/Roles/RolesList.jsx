@@ -1,11 +1,11 @@
-import  React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Table, Button, Space, Modal, Form, Input, message, Select } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useAuth } from '../../../../../contexts/AuthContext.jsx';
 import styles from './RolesList.module.css';
 import axios from 'axios';
 
-const RolesList = ({ data, onAddNew, onUpdate, onDelete, className, authData}) => {
+const RolesList = ({ data, onAddNew, onUpdate, onDelete, className, authData }) => {
   const [isModalVisible, setIsModalVisible] = React.useState(false);
   const [form] = Form.useForm();
   const [loading, setLoading] = React.useState(false);
@@ -128,7 +128,7 @@ const RolesList = ({ data, onAddNew, onUpdate, onDelete, className, authData}) =
       });
     }
     catch (err) {
-      error(
+      message.error(
         `Registration Failed: ${err.response?.data?.message || "Unknown error"}`
       );
       setLoading(false);
@@ -149,9 +149,6 @@ const RolesList = ({ data, onAddNew, onUpdate, onDelete, className, authData}) =
       });
       message.error(`Registration Failed: ${err.response?.data?.message || "Unknown error"}`);
       console.error("Registration Error:", err);
-      error(
-        `Registration Failed: ${err.response?.data?.message || "Unknown error"}`
-      );
     }
     finally {
       setLoading(false);
@@ -164,7 +161,7 @@ const RolesList = ({ data, onAddNew, onUpdate, onDelete, className, authData}) =
       .then(values => {
         handleRegister(values);
       })
-      .catch(() => {});
+      .catch(() => { });
   };
 
   const handleOrgChange = (orgId) => {
@@ -172,7 +169,7 @@ const RolesList = ({ data, onAddNew, onUpdate, onDelete, className, authData}) =
     localStorage.setItem('orgid', orgId);
   };
 
-const handleDelete = (id, email) => {
+  const handleDelete = (id, email) => {
     confirm({
       title: 'Are you sure you want to delete this user?',
       content: `This will permanently delete the user with email "${email}" and cannot be undone.`,
@@ -277,9 +274,9 @@ const handleDelete = (id, email) => {
 
       {/* Add New Role Button */}
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
-        <Button 
-          type="primary" 
-          icon={<PlusOutlined />} 
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
           onClick={showModal}
           className={styles.addButton}
           disabled={!selectedOrg}
@@ -302,18 +299,18 @@ const handleDelete = (id, email) => {
               key: 'actions',
               render: (_, record) => (
                 <Space size="middle">
-                  <Button 
-                    type="link" 
-                    icon={<EditOutlined />} 
+                  <Button
+                    type="link"
+                    icon={<EditOutlined />}
                     onClick={() => handleEditClick(record)}
                     className={styles.editButton}
                   >
                     Edit
                   </Button>
-                  <Button 
-                    type="link" 
-                    danger 
-                    icon={<DeleteOutlined />} 
+                  <Button
+                    type="link"
+                    danger
+                    icon={<DeleteOutlined />}
                     onClick={() => handleDelete(record.id, record.email)}
                     className={styles.deleteButton}
                     loading={loading}
@@ -407,7 +404,7 @@ const handleDelete = (id, email) => {
               <Select.Option value="KITCHEN_STAFF">Kitchen Staff</Select.Option>
             </Select>
           </Form.Item>
-          
+
           <Form.Item
             shouldUpdate={(prev, curr) => prev.role !== curr.role}
             noStyle
