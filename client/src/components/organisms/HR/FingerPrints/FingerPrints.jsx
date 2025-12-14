@@ -54,35 +54,38 @@ const FingerPrintsContent = () => {
   const [deviceCards, setDeviceCards] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [searchError, setSearchError] = useState("");
-  const [unlockingDoor, setUnlockingDoor] = useState(false);
   const { authData } = useAuth();
   const { theme } = useTheme();
 
-  // Handle unlock door button click
-  const handleUnlockDoor = async () => {
+  // Track which unit is currently unlocking
+  const [unlockingUnit, setUnlockingUnit] = useState(null);
+
+  // Handle unlock door button click for a specific unit
+  const handleUnlockDoor = async (unitName) => {
     if (!authData?.orgId) {
       message.error("Organization ID not found");
       return;
     }
 
-    console.log('🔓 Unlock button clicked - sending request...');
+    console.log(`🔓 Unlock button clicked for unit: ${unitName}`);
     console.log('Organization ID:', authData.orgId);
     console.log('Admin Name:', authData?.user?.name || "Administrator");
 
-    setUnlockingDoor(true);
+    setUnlockingUnit(unitName);
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_BASE_URL}/door-unlock/unlock`,
         {
           orgId: authData.orgId,
           adminName: authData?.user?.name || "Administrator",
+          unitName: unitName,
         }
       );
 
       console.log('✅ Server response:', response.data);
 
       if (response.data.success) {
-        message.success("Door unlock command sent successfully!");
+        message.success(`Door unlock command sent to ${unitName}!`);
       } else {
         message.error("Failed to send unlock command");
       }
@@ -90,7 +93,7 @@ const FingerPrintsContent = () => {
       console.error("❌ Error unlocking door:", error);
       message.error("Failed to unlock door: " + (error.response?.data?.message || error.message));
     } finally {
-      setUnlockingDoor(false);
+      setUnlockingUnit(null);
     }
   };
 
@@ -378,6 +381,20 @@ const FingerPrintsContent = () => {
                   <div className={styles.unitStat}>
                     Available: <span>{card.available}/1000</span>
                   </div>
+                  <Button
+                    type="primary"
+                    style={{ 
+                      backgroundColor: '#970000', 
+                      borderColor: '#970000',
+                      marginTop: '12px',
+                      width: '100%'
+                    }}
+                    icon={<UnlockOutlined />}
+                    loading={unlockingUnit === card.unit}
+                    onClick={() => handleUnlockDoor(card.unit)}
+                  >
+                    Unlock Door: {card.unit}
+                  </Button>
                 </div>
               );
             })
@@ -391,15 +408,6 @@ const FingerPrintsContent = () => {
           <div className={styles.container}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
               <h3 className={styles.unitsTitle}>User Fingerprint Details</h3>
-              <Button 
-                type="primary" 
-                style={{ backgroundColor: '#970000', borderColor: '#970000' }}
-                icon={<UnlockOutlined />}
-                loading={unlockingDoor}
-                onClick={handleUnlockDoor}
-              >
-                Unlock the Door
-              </Button>
             </div>
             {/* Search Bar for Employee ID or Name */}
             <div

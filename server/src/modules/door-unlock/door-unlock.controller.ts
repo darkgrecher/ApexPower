@@ -8,8 +8,8 @@ export class DoorUnlockController {
   @Post('unlock')
   @HttpCode(HttpStatus.OK)
   async unlockDoor(
-    @Body() body: { orgId: string; adminName: string },
+    @Body() body: { orgId: string; adminName: string; unitName: string },
   ) {
-    return this.doorUnlockService.unlockDoor(body.orgId, body.adminName);
+    return this.doorUnlockService.unlockDoor(body.orgId, body.adminName, body.unitName);
   }
 }

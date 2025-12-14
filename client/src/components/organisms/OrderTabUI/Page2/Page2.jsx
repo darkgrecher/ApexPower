@@ -75,10 +75,13 @@ const Page2 = ({
 
     socket.on('connect', () => {
       console.log('✅ Connected to door-unlock WebSocket');
-      console.log('📡 Registering as tablet');
-      // Register this tablet with the server
+      console.log('📡 Registering as tablet with unit:', window.fingerprintUnitName || 'none');
+      // Register this tablet with the server (unit name will be updated when fingerprint unit connects)
       socket.emit('register', {
         clientType: 'tablet',
+        unitName: window.fingerprintUnitName || null,
+      }, (response) => {
+        console.log('📡 Server acknowledged registration:', response);
       });
     });
 
@@ -93,6 +96,14 @@ const Page2 = ({
     // Listen for unlock door commands from administration
     socket.on('unlock-door', async (data) => {
       console.log('🚪 Received unlock-door command from admin:', data);
+      console.log('🔌 Target unit:', data.unitName);
+      console.log('🔌 Connected unit:', window.fingerprintUnitName);
+
+      // Check if this command is for our connected fingerprint unit
+      if (data.unitName && window.fingerprintUnitName && data.unitName !== window.fingerprintUnitName) {
+        console.log(`⏭️ Ignoring unlock command - target unit ${data.unitName} doesn't match connected unit ${window.fingerprintUnitName}`);
+        return;
+      }
 
       // Use refs to get the current BLE connection state
       const currentBLE = fingerprintBLERef.current;
@@ -122,7 +133,7 @@ const Page2 = ({
       }
 
       // Show admin unlock alert for 5 seconds
-      const alertMessage = `Door unlocked by ${data.adminName || 'Administration'}`;
+      const alertMessage = `Door unlocked by ${data.adminName || 'Administration'} (Unit: ${data.unitName || 'Unknown'})`;
       console.log('🔔 Displaying alert:', alertMessage);
       setAdminUnlockAlert(alertMessage);
       setTimeout(() => {
@@ -354,6 +365,19 @@ const Page2 = ({
         setFingerprintUnitName(unitName);
         window.fingerprintUnitName = unitName; // Store globally for persistence
         console.log(`Unit Name received: ${unitName}`);
+        
+        // Update WebSocket room with the connected unit name
+        if (socketRef.current && socketRef.current.connected) {
+          console.log(`📡 Emitting update-unit event for unit: ${unitName}`);
+          socketRef.current.emit('update-unit', { unitName: unitName }, (response) => {
+            console.log(`📡 Server acknowledged update-unit:`, response);
+          });
+        } else {
+          console.warn(`⚠️ Socket not connected, cannot update unit room. Socket state:`, {
+            socketExists: !!socketRef.current,
+            connected: socketRef.current?.connected
+          });
+        }
       } else if (line.includes('Fingerprint ID #') && line.includes('deleted')) {
         console.log(`✅ R307 Delete Success: ${line}`);
       } else if (line.includes('Failed to delete fingerprint ID #')) {
