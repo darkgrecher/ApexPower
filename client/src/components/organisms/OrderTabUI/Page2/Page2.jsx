@@ -365,7 +365,7 @@ const Page2 = ({
         setFingerprintUnitName(unitName);
         window.fingerprintUnitName = unitName; // Store globally for persistence
         console.log(`Unit Name received: ${unitName}`);
-        
+
         // Update WebSocket room with the connected unit name
         if (socketRef.current && socketRef.current.connected) {
           console.log(`📡 Emitting update-unit event for unit: ${unitName}`);

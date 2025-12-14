@@ -383,8 +383,8 @@ const FingerPrintsContent = () => {
                   </div>
                   <Button
                     type="primary"
-                    style={{ 
-                      backgroundColor: '#970000', 
+                    style={{
+                      backgroundColor: '#970000',
                       borderColor: '#970000',
                       marginTop: '12px',
                       width: '100%'
