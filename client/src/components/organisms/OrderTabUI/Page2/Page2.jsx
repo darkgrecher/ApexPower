@@ -644,12 +644,20 @@ const Page2 = ({
         const user = await response.json();
 
         // Use the helper function to handle authentication with payment checking
-        await handleUserAuthentication(user);
+        const authSuccess = await handleUserAuthentication(user);
+
+        // If authentication failed due to payment, reset PIN
+        if (!authSuccess) {
+          setPin("");
+        }
 
       } catch (error) {
         console.error("Error fetching user:", error);
         setErrorMessage(text.invalidPin);
-        setTimeout(() => setErrorMessage(""), 2000);
+        setTimeout(() => {
+          setErrorMessage("");
+          setPin("");
+        }, 2000);
       } finally {
         setScanning(false);
       }

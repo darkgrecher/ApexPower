@@ -273,6 +273,7 @@ export class UserService {
           name: true,
           gender: true,
           organizationId: true,
+          paymentStatus: true,
         },
       });
       if (user) {
