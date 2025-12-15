@@ -1076,10 +1076,10 @@ const Page2 = ({
       {paymentAlert && (
         <>
           <div className={styles.verifiedBackdrop}></div>
-          <div className={styles.paymentAlertPopup}>
+          <div className={styles.paymentAlertPopup} style={{ backgroundColor: 'white' }}>
             <div className={styles.paymentAlertIcon}>⚠️</div>
-            <div className={styles.paymentAlertText}>{paymentAlert}</div>
-            <div className={styles.paymentAlertSubtext}> Closing in 5 seconds Automatically...</div>
+            <div className={styles.paymentAlertText} style={{ color: 'red' }}>{paymentAlert}</div>
+            <div className={styles.paymentAlertSubtext} style={{ color: 'red' }}> Closing in 5 seconds Automatically...</div>
           </div>
         </>
       )}
